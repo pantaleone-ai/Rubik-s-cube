@@ -3,7 +3,7 @@
 > GitHub Issues are disabled for this repository (GitHub API returned HTTP 410). Enable Settings → General → Features → Issues to turn these workstreams into issues.
 
 ## Feature group 01 — Puzzle engine and cube foundation
-- [ ] Correct NxN outer-layer selection for all six faces, including even dimensions.
+- [x] Correct NxN outer-layer selection for all six faces, including even dimensions (PR #2).
 - [ ] Keep logical cube state as the source of truth after animated moves.
 - [ ] Add deterministic state-transition and inverse-move tests.
 - [ ] Separate puzzle metadata, move rules, scramble generation and renderers behind a registry.
@@ -22,14 +22,14 @@
 - [ ] Keyboard and touch controls with accessible focus states.
 
 ## Feature group 04 — Product experience
-- [ ] Explore catalog with search, family filters and difficulty.
+- [x] Explore catalog with search and family filters (initial catalog shipped in PR #2; difficulty is displayed).
 - [ ] Dedicated play routes for each puzzle ID.
-- [ ] Responsive desktop workspace and mobile bottom-sheet controls.
+- [ ] Responsive desktop workspace and mobile bottom-sheet controls (not yet implemented).
 - [ ] shadcn/ui primitives and Tailwind design tokens.
 - [ ] Empty, loading, error and reduced-motion states.
 
 ## Feature group 05 — Learn and challenges
-- [ ] Puzzle-specific notation guides.
+- [x] Initial cube notation and solving concepts landing page (PR #2); puzzle-specific guides remain.
 - [ ] Step-by-step algorithms with play, pause, previous/next and piece highlighting.
 - [ ] Curated and daily scramble challenges.
 - [ ] Local personal bests and reproducible challenge seeds.
