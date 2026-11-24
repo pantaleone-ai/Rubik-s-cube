@@ -314,7 +314,7 @@ const Rubiks = forwardRef<RubiksHandle, { dimension: number }>(
       case "U":
 
         axis = "y";
-        layer = 1;
+        layer = outerLayer;
 
         angle =
           Math.PI / 2;
@@ -325,7 +325,7 @@ const Rubiks = forwardRef<RubiksHandle, { dimension: number }>(
       case "D":
 
         axis = "y";
-        layer = -1;
+        layer = -outerLayer;
 
         angle =
           -Math.PI / 2;
@@ -336,7 +336,7 @@ const Rubiks = forwardRef<RubiksHandle, { dimension: number }>(
       case "F":
 
         axis = "z";
-        layer = 1;
+        layer = outerLayer;
 
         angle =
           -Math.PI / 2;
@@ -347,7 +347,7 @@ const Rubiks = forwardRef<RubiksHandle, { dimension: number }>(
       case "B":
 
         axis = "z";
-        layer = -1;
+        layer = -outerLayer;
 
         angle =
           Math.PI / 2;
