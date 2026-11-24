@@ -81,39 +81,16 @@ interface AnimationState {
    CREATE SOLVED CUBE
 ========================================================= */
 
-function createCubies(): Cubie[] {
+function createCubies(size: number): Cubie[] {
   const result: Cubie[] = [];
-
-  for (
-    let x = -1;
-    x <= 1;
-    x++
-  ) {
-    for (
-      let y = -1;
-      y <= 1;
-      y++
-    ) {
-      for (
-        let z = -1;
-        z <= 1;
-        z++
-      ) {
-
-        result.push({
-          id: result.length,
-
-          position: [
-            x,
-            y,
-            z,
-          ],
-        });
-
+  const offset = (size - 1) / 2;
+  for (let x = 0; x < size; x++) {
+    for (let y = 0; y < size; y++) {
+      for (let z = 0; z < size; z++) {
+        result.push({ id: result.length, position: [x - offset, y - offset, z - offset] });
       }
     }
   }
-
   return result;
 }
 
@@ -239,16 +216,11 @@ function rotatePosition(
    RUBIKS
 ========================================================= */
 
-const Rubiks = forwardRef<
-  RubiksHandle
->((_, ref) => {
-
-  const [
-    cubies,
-    setCubies,
-  ] = useState<Cubie[]>(
-    createCubies
-  );
+const Rubiks = forwardRef<RubiksHandle, { dimension: number }>(
+  ({ dimension }, ref) => {
+    const [cubies, setCubies] = useState<Cubie[]>(() => createCubies(dimension));
+    const cubiesRef = useRef<Cubie[]>(createCubies(dimension));
+    const moveQueue = useRef<Array<{ face: Face; reverse: boolean }>>([]);
 
 
   /* =======================================================
@@ -311,8 +283,8 @@ const Rubiks = forwardRef<
       | "z";
 
     let layer: number;
-
     let angle: number;
+    const outerLayer = (dimension - 1) / 2;
 
 
     switch (face) {
@@ -320,7 +292,7 @@ const Rubiks = forwardRef<
       case "R":
 
         axis = "x";
-        layer = 1;
+        layer = outerLayer;
 
         angle =
           Math.PI / 2;
@@ -331,7 +303,7 @@ const Rubiks = forwardRef<
       case "L":
 
         axis = "x";
-        layer = -1;
+        layer = -outerLayer;
 
         angle =
           -Math.PI / 2;
@@ -415,9 +387,8 @@ const Rubiks = forwardRef<
      * existing animation.
      */
 
-    if (
-      animation.current.active
-    ) {
+    if (animation.current.active) {
+      moveQueue.current.push({ face, reverse });
       return;
     }
 
@@ -445,9 +416,7 @@ const Rubiks = forwardRef<
       [];
 
 
-    for (
-      const cubie of cubies
-    ) {
+    for (const cubie of cubiesRef.current) {
 
       const [
         x,
@@ -714,35 +683,11 @@ const Rubiks = forwardRef<
        UPDATE LOGICAL STATE
     ===================================================== */
 
-    setCubies(
-      current =>
-        current.map(
-          cubie => {
-
-            const next =
-              nextPositions.get(
-                cubie.id
-              );
-
-
-            if (!next) {
-              return cubie;
-            }
-
-
-            return {
-              ...cubie,
-
-              position: [
-                next[0],
-                next[1],
-                next[2],
-              ],
-            };
-
-          }
-        )
-    );
+    cubiesRef.current = cubiesRef.current.map((cubie) => {
+      const next = nextPositions.get(cubie.id);
+      return next ? { ...cubie, position: next } : cubie;
+    });
+    setCubies(cubiesRef.current);
 
 
     /* =====================================================
@@ -808,8 +753,9 @@ const Rubiks = forwardRef<
      * coordinates.
      */
 
-    const solved =
-      createCubies();
+    moveQueue.current = [];
+    const solved = createCubies(dimension);
+    cubiesRef.current = solved;
 
 
     for (
@@ -903,9 +849,9 @@ const Rubiks = forwardRef<
         animation.current;
 
 
-      if (
-        !anim.active
-      ) {
+      if (!anim.active) {
+        const nextMove = moveQueue.current.shift();
+        if (nextMove) move(nextMove.face, nextMove.reverse);
         return;
       }
 

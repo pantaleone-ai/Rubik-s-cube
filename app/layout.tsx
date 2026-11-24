@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Rubik's Cube",
-  description: "3D interactive Rubik&apos;s Cube",
+  title: "Twist — 3D Puzzle Studio",
+  description: "Explore and solve interactive 3D twisty puzzles from 2×2 to 5×5.",
 
   icons: {
     icon: "/rubiks.png",

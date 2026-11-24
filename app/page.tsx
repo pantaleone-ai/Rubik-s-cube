@@ -388,13 +388,19 @@ export default function Home() {
    * camera + orbit target.
    */
 
-  const [
-    canvasMode,
-    setCanvasMode,
-  ] =
-    useState<CanvasMode>(
-      "orbit"
-    );
+  const [canvasMode, setCanvasMode] = useState<CanvasMode>("orbit");
+  const [cubeSize, setCubeSize] = useState(3);
+  const scramble = useCallback(() => {
+    const faces: Face[] = ["R", "L", "U", "D", "F", "B"];
+    let previous: Face | null = null;
+    const count = cubeSize === 2 ? 15 : cubeSize * 8;
+    for (let index = 0; index < count; index++) {
+      let face = faces[Math.floor(Math.random() * faces.length)];
+      while (face === previous) face = faces[Math.floor(Math.random() * faces.length)];
+      previous = face;
+      rubiksRef.current?.move(face, Math.random() > 0.5);
+    }
+  }, [cubeSize]);
 
   const updateMapping =
     useCallback(
@@ -516,6 +522,13 @@ export default function Home() {
         </p>
       </header>
 
+      <div className="pointer-events-auto absolute right-4 top-4 z-30 sm:right-7 sm:top-7">
+        <label htmlFor="cube-size" className="mb-1 block text-[9px] font-medium uppercase tracking-[0.18em] text-white/40">Puzzle size</label>
+        <select id="cube-size" value={cubeSize} onChange={(event) => setCubeSize(Number(event.target.value))} className="h-9 rounded-lg border border-white/10 bg-[#0b111c]/95 px-3 text-xs font-medium text-white shadow-lg outline-none transition focus:border-white/30">
+          {[2, 3, 4, 5].map((size) => <option key={size} value={size}>{size} × {size}</option>)}
+        </select>
+      </div>
+
       {/* =================================================
           CANVAS
       ================================================= */}
@@ -608,12 +621,8 @@ export default function Home() {
               Cube itself remains at origin.
           ================================================= */}
 
-          <ResponsiveCube>
-            <Rubiks
-              ref={
-                rubiksRef
-              }
-            />
+          <ResponsiveCube puzzleSize={cubeSize}>
+            <Rubiks key={cubeSize} dimension={cubeSize} ref={rubiksRef} />
           </ResponsiveCube>
         </Canvas>
       </div>
@@ -638,9 +647,9 @@ export default function Home() {
         setCanvasMode={
           setCanvasMode
         }
-        rubiksRef={
-          rubiksRef
-        }
+        rubiksRef={rubiksRef}
+        cubeSize={cubeSize}
+        onScramble={scramble}
       />
 
       {/* =================================================
@@ -1173,6 +1182,8 @@ function DraggableMovePanel({
   canvasMode,
   setCanvasMode,
   rubiksRef,
+  cubeSize,
+  onScramble,
 }: {
   mapping: ViewMapping;
 
@@ -1194,10 +1205,9 @@ function DraggableMovePanel({
       >
     >;
 
-  rubiksRef:
-    React.RefObject<
-      RubiksHandle | null
-    >;
+  rubiksRef: React.RefObject<RubiksHandle | null>;
+  cubeSize: number;
+  onScramble: () => void;
 }) {
   const panelRef =
     useRef<HTMLDivElement>(
@@ -1968,6 +1978,9 @@ function DraggableMovePanel({
               p-2.5
             "
           >
+            <button type="button" onClick={onScramble} className="mb-2 flex h-9 w-full items-center justify-center rounded-md bg-white text-xs font-semibold text-[#080d16] transition hover:bg-white/90 active:scale-[0.98]">
+              Scramble {cubeSize} × {cubeSize}
+            </button>
             <div
               className="
                 grid
@@ -2076,43 +2089,7 @@ function DraggableMovePanel({
               )}
             </div>
 
-            {/* RESET */}
-
-            <button
-              type="button"
-              onClick={() =>
-                rubiksRef.current?.reset()
-              }
-              className="
-                mt-2
-                flex
-                h-7
-                w-full
-
-                items-center
-                justify-center
-
-                rounded-md
-
-                border
-                border-white/6
-
-                bg-white/[0.02]
-
-                text-[9px]
-                font-medium
-                text-white/35
-
-                transition
-
-                hover:bg-white/[0.06]
-                hover:text-white
-
-                active:scale-[0.98]
-              "
-            >
-              Reset Cube
-            </button>
+            {/* Reset is grouped with the scramble action above. */}
           </div>
         )}
       </div>
@@ -2176,8 +2153,10 @@ function DraggableMovePanel({
 
 function ResponsiveCube({
   children,
+  puzzleSize,
 }: {
   children: React.ReactNode;
+  puzzleSize: number;
 }) {
   const {
     size,
@@ -2230,9 +2209,7 @@ function ResponsiveCube({
         1;
     }
 
-    group.scale.setScalar(
-      scale
-    );
+    group.scale.setScalar(scale * (3 / puzzleSize));
   });
 
   return (
