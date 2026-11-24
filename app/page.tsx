@@ -522,7 +522,7 @@ export default function Home() {
         </p>
       </header>
 
-      <nav aria-label="Main navigation" className="pointer-events-auto absolute left-1/2 top-5 z-30 flex -translate-x-1/2 items-center gap-1 rounded-full border border-white/10 bg-[#0b111c]/90 p-1 shadow-xl backdrop-blur sm:top-7">
+      <nav aria-label="Main navigation" className="pointer-events-auto absolute left-5 top-28 z-30 flex items-center gap-1 sm:left-1/2 sm:top-7 sm:-translate-x-1/2 rounded-full border border-white/10 bg-[#0b111c]/90 p-1 shadow-xl backdrop-blur sm:top-7">
         <a href="/" aria-current="page" className="rounded-full bg-white px-3 py-1.5 text-[10px] font-semibold text-[#080d16]">Play</a>
         <a href="/explore" className="rounded-full px-3 py-1.5 text-[10px] font-medium text-white/65 transition hover:bg-white/10 hover:text-white">Explore</a>
         <a href="/learn" className="rounded-full px-3 py-1.5 text-[10px] font-medium text-white/65 transition hover:bg-white/10 hover:text-white">Learn</a>
